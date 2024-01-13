@@ -58,6 +58,7 @@ def main():
         # Quizzing
         api_key = os.getenv("OPENAI_API_KEY")
         llm = OpenAI(openai_api_key=api_key)
+
         
         for i in range(noq):
             prompt_template = PromptTemplate.from_template(
