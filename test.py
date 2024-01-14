@@ -69,22 +69,29 @@ def quizzing(i, noq, pdf_text, time_limit):
         "multiple choice",
         label_visibility="collapsed",
         options=(mc[1][:-1], mc[2][:-1], mc[3][:-1], mc[4][:-1]),
-        index=None
+        index=None, 
     )
     
     # Correct answer
-    global correct_ans
     correct_ans = mc[5]
     
 
     if mc_choice is not None:
         if str(correct_ans).strip() == str(mc_choice).strip():
             st.info(f"Correct 🟢 You selected '{mc_choice}'")
+            corrects += 1
         else: 
             st.info(f"You selected '{mc_choice}'")
             st.error(f"Incorrect 🔴 Correct answer is '{correct_ans}'. ")
+            
     else: 
-        time.sleep(time_limit)
+        progress_bar = st.progress(0, text="Time is passing ...")
+        for t in range(time_limit):
+            time.sleep(1)
+            progress_bar.progress(100//time_limit * t, text="Time is passing ...")
+
+        progress_bar.empty()
+        st.error(f"Out of time! 🔴 Correct answer is '{correct_ans}'. ")
 
 
 def main():
@@ -125,36 +132,23 @@ def main():
     if cancel_button:
         st.stop()
         
+    global corrects
+    corrects = 0
+        
     if pdf is not None:
         st.empty()
         pdf_reader = PdfReader(pdf)
         pdf_text = ""                       # Initialize a string to accumulate extracted text
         for page in pdf_reader.pages:       # Loop through each page in the PDF
             pdf_text += page.extract_text()
-            
-        # placeholder = st.empty()
-            
-        # placeholder.container()
         
         j = 0
-        
 
         while j < noq:
-            # placeholder.quizzing(j, noq, pdf_text, time_limit)
             quizzing(j, noq, pdf_text, time_limit)
             j += 1
                 
-        st.write("Quiz Finsihed!")
-        
-        
-
-
-
-
-
-            
-
-            
+        st.write(f"Quiz Finsihed! Your score is {str(corrects)} / {noq}. ")
 
 
 
