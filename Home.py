@@ -38,8 +38,7 @@ def main():
             label = "Enter your OpenAI API Key:",
             type = "password",
             placeholder = "sk-",
-            # value="",
-            value = "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",
+            value="",
             label_visibility = "collapsed",
         )
         

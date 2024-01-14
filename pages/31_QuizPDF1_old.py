@@ -7,18 +7,14 @@ from langchain.prompts import PromptTemplate
 from langchain.chains import SequentialChain
 from langchain_community.callbacks import get_openai_callback
 from langchain_community.chat_models import ChatOpenAI
-from langchain.prompts.chat import ChatPromptTemplate
-from langchain.chains.summarize import load_summarize_chain
-
 import traceback
 import json
 import pandas as pd
 from helpers.quizpdf_utils import parse_file, get_table_data, RESPONSE_JSON
 
-
 def main():
     OPENAI_API_KEY = st.session_state.openai_api_key
-
+    
     st.set_page_config(
         page_title="QuizPDF",
         page_icon="🧠",
@@ -38,8 +34,8 @@ def main():
     )
     
     # This is an LLMChain to create 10-20 multiple choice questions from a given piece of text.
-    llm = ChatOpenAI(model_name="gpt-3.5-turbo")
-    # llm = OpenAI(model_name="gpt-3.5-turbo", temperature=0, max_tokens=-1)
+    llm = OpenAI(model_name="gpt-3.5-turbo", temperature=0, max_tokens=-1)
+
     template = """
         Text: {text}
         You are an expert MCQ maker. Given the above text, it is your job to\
@@ -47,28 +43,21 @@ def main():
         Make sure that questions are not repeated and check all the questions to be conforming to the text as well.
         Make sure to format your response like the RESPONSE_JSON below and use it as a guide.\
         Ensure to make the {number} MCQs.
-        Ensure to summarize so that there are no more than 50000 tokens.
-        
         ### RESPONSE_JSON
         {response_json}
     """
     
-    quiz_generation_prompt = ChatPromptTemplate.from_template(template)
-    # quiz_generation_prompt = PromptTemplate(
-    #     input_variables=["text", "number", "grade", "tone", "response_json"],
-    #     template=template,
-    # )
+    quiz_generation_prompt = PromptTemplate(
+        input_variables=["text", "number", "grade", "tone", "response_json"],
+        template=template,
+    )
     
     quiz_chain = LLMChain(
         llm=llm, prompt=quiz_generation_prompt, output_key="quiz", verbose=True
     )
 
-    # https://medium.com/@johnidouglasmarangon/how-to-summarize-text-with-openai-and-langchain-e038fc922af
-    
     # This is an LLMChain to evaluate the multiple choice questions created by the above chain
-    # llm = OpenAI(model_name="gpt-3.5-turbo", temperature=0)
-    # llm = ChatOpenAI(model_name="gpt-4-1106-preview")
-    llm2 = ChatOpenAI(model_name="gpt-3.5-turbo-1106")
+    llm = OpenAI(model_name="gpt-3.5-turbo", temperature=0)
     template = """
         You are an expert english grammarian and writer. Given a multiple choice quiz for {grade} grade students.\
         You need to evaluate complexity of the questions and give a complete analysis of the quiz if the students 
@@ -80,14 +69,12 @@ def main():
         Critique from an expert english writer of the above quiz:
     """
 
-    quiz_evaluation_prompt = ChatPromptTemplate.from_template(template)
-    # quiz_evaluation_prompt = PromptTemplate(
-    #     input_variables=["grade", "quiz"], 
-    #     template=template,
-    # )
+    quiz_evaluation_prompt = PromptTemplate(
+        input_variables=["grade", "quiz"], template=template
+    )
     
     review_chain = LLMChain(
-        llm=llm2, prompt=quiz_evaluation_prompt, output_key="review", verbose=True
+        llm=llm, prompt=quiz_evaluation_prompt, output_key="review", verbose=True
     )
 
     # This is the overall chain where we run these two chains in sequence.

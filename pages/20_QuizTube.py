@@ -41,6 +41,7 @@ def main():
             "Enter the YouTube video link: (under 10min)",
             value="https://www.youtube.com/watch?v=bcYwiwsDfGE"
         )
+
         submitted = st.form_submit_button("Generate Quiz")
 
     if submitted or ('quiz_data_list' in st.session_state):

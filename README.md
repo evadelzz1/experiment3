@@ -17,7 +17,8 @@
     echo '.env'  >> .gitignore
     echo '.venv' >> .gitignore
 
-    echo 'OPENAI_API_KEY=sk-9jz....' >> .env
+    echo 'OPENAI_API_KEY=sk-9jz....'    >> .env
+    echo 'USER_PASSWORD="passwd"'       >> .env
 
     ls -la
 
