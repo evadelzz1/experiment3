@@ -11,13 +11,12 @@ import time
 
 
 
-def moveon(question, choices, info):
-    question.empty()
-    choices.empty()
-    info.empty()
+def initialize():
+    if 'loq' not in st.session_state:
+        st.session_state.loq = []
     
-
-def quizzing(num, noq, pdf_text, time_limit):
+    
+def quizzer(pdf_text):
     api_key = os.getenv("OPENAI_API_KEY")
     llm = OpenAI(openai_api_key=api_key)
     
@@ -26,7 +25,7 @@ def quizzing(num, noq, pdf_text, time_limit):
         {pdf_file}
         
         Follow this template:
-            (Question)
+            Question: (Question)
             A. (multiple choice)
             B. (multiple choice)
             C. (multiple choice)
@@ -34,7 +33,7 @@ def quizzing(num, noq, pdf_text, time_limit):
             (Correct Answer)
         
         Example: 
-            What run should you take to warm up on Blackcomb Mountain?
+            Question: What run should you take to warm up on Blackcomb Mountain?
             A. Easy Out
             B. Countdown
             C. Big Easy
@@ -43,17 +42,28 @@ def quizzing(num, noq, pdf_text, time_limit):
         
         '''
     )
-    quiz = prompt_template.format(noq=noq, pdf_file=pdf_text)
-    generated = llm(quiz)
+    quiz = prompt_template.format(pdf_file=pdf_text)
+    
+    return llm(quiz)
+
+
+def quizzing(i, noq, pdf_text, time_limit):
+    
+    # list of questions
+    for k in range(noq):
+        st.session_state.loq.append(quizzer(pdf_text))
     
     # Only print out question portion
-    question = generated.split('?')
-    st.subheader('Question ' + str(num + 1))
-    st.write (question[0] + '?')
+    question = st.session_state.loq[i].split('?')
+    
+    st.subheader('Question ' + str(i + 1))
+        
+    st.write (question[0][10:] + '?')
     
     # Only print out multiple choice portion
     # [:-1] is used to omit 'A', 'B', 'C', 'D' in the end of each string
     mc = question[1].split('.')
+
     
     mc_choice = st.radio(
         "multiple choice",
@@ -63,26 +73,22 @@ def quizzing(num, noq, pdf_text, time_limit):
     )
     
     # Correct answer
+    global correct_ans
     correct_ans = mc[5]
+    
 
     if mc_choice is not None:
-        if correct_ans == mc_choice:
-            st.markdown(f"You selected **{mc_choice}**")
-            st.write("Correct 🟢")
-            question.empty()
+        if str(correct_ans).strip() == str(mc_choice).strip():
+            st.info(f"Correct 🟢 You selected '{mc_choice}'")
         else: 
-            st.markdown(f"You selected **{mc_choice}**")
-            st.write(f"Incorrect 🔴 \nCorrect answer is {correct_ans}. ")
-            
-    else:
+            st.info(f"You selected '{mc_choice}'")
+            st.error(f"Incorrect 🔴 Correct answer is '{correct_ans}'. ")
+    else: 
         time.sleep(time_limit)
-        st.write("You didn't answer in time!")
-        st.write(f"Out of time! 🔴 \nCorrect answer is {correct_ans}. ")
-    
 
 
 def main():
-    placeholder = st.empty()
+    initialize()
     
     # load api_key
     if not load_dotenv():
@@ -113,31 +119,41 @@ def main():
         )
     
     pdf = st.file_uploader("Upload your PDF", type="pdf")
+    cancel_button = st.button('Cancel')
+    
+    
+    if cancel_button:
+        st.stop()
         
     if pdf is not None:
         st.empty()
         pdf_reader = PdfReader(pdf)
         pdf_text = ""                       # Initialize a string to accumulate extracted text
         for page in pdf_reader.pages:       # Loop through each page in the PDF
-            pdf_text += page.extract_text() 
+            pdf_text += page.extract_text()
+            
+        # placeholder = st.empty()
+            
+        # placeholder.container()
+        
+        j = 0
+        
+
+        while j < noq:
+            # placeholder.quizzing(j, noq, pdf_text, time_limit)
+            quizzing(j, noq, pdf_text, time_limit)
+            j += 1
+                
+        st.write("Quiz Finsihed!")
+        
+        
+
+
+
+
 
             
-        for i in range(noq):
-            quizzing(i, noq, pdf_text, time_limit)
-            i += 1
-            
-            # if mc_choice is not None:
-            #     if correct_ans == mc_choice:
-            #         st.markdown(f"You selected **{mc_choice}**")
-            #         st.write("Correct 🟢")
-            #     else: 
-            #         st.markdown(f"You selected **{mc_choice}**")
-            #         st.write(f"Incorrect 🔴 \nCorrect answer is {correct_ans}. ")
-                    
-            # else:
-            #     time.sleep(time_limit)
-            #     st.write("You didn't answer in time!")
-            #     st.write(f"Out of time! 🔴 \nCorrect answer is {correct_ans}. ")
+
             
 
 
