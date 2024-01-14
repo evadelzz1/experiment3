@@ -49,6 +49,8 @@ def quizzer(pdf_text):
 
 def quizzing(i, noq, pdf_text, time_limit):
     
+    global corrects
+    
     # list of questions
     for k in range(noq):
         st.session_state.loq.append(quizzer(pdf_text))
@@ -148,7 +150,7 @@ def main():
             quizzing(j, noq, pdf_text, time_limit)
             j += 1
                 
-        st.write(f"Quiz Finsihed! Your score is {str(corrects)} / {noq}. ")
+        st.subheader(f"Quiz Finsihed! Your score is {str(corrects)} / {noq}. ")
 
 
 
