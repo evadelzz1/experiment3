@@ -80,7 +80,6 @@ def split_questions_answers(quiz_response):
     answers = quiz_response.split("Answers:")[1]
     return questions, answers
 
-
 def main():
     openai_api_key = st.sidebar.text_input("Enter your OpenAI API key", type="password")
     if openai_api_key != "":

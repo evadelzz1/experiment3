@@ -4,3 +4,6 @@ langchain_community
 streamlit
 streamlit_extras
 python_dotenv
+youtube_transcript_api
+pytube
+PyPDF2
