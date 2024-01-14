@@ -70,6 +70,7 @@ def main():
         )
         if (inputPassword == st.session_state.user_password):
             st.session_state.openai_api_key = os.getenv("OPENAI_API_KEY")
+            st.write(st.session_state.openai_api_key)
             authorized = True        
 
     # st.session_state.openai = openai.OpenAI(
