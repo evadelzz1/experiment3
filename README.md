@@ -40,7 +40,7 @@
 
 ### Running the Application
 
-    python -m streamlit run main.py
+    python -m streamlit run Home.py
 
 ### Deactivate the virtual environment
 

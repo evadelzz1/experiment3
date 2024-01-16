@@ -7,3 +7,5 @@ python_dotenv
 youtube_transcript_api
 pytube
 PyPDF2
+python-pptx
+tk
