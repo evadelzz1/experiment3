@@ -9,3 +9,6 @@ pytube
 PyPDF2
 python-pptx
 tk
+tiktoken
+faiss-cpu
+pypdf

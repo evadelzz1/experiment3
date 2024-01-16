@@ -63,6 +63,7 @@ def main():
         The application records responses and calculates scores.
         """
     )
+    st.write('🎃 https://github.com/Gaurang3355/AI-quiz-generator')
     
     initialize_session_state()
 
