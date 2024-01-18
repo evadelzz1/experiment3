@@ -12,8 +12,8 @@ import time
 
 
 def initialize():
-    if 'loq' not in st.session_state:
-        st.session_state.loq = []
+    if 'q' not in st.session_state:
+        st.session_state.q = []
     
     
 def quizzer(pdf_text):
@@ -52,11 +52,13 @@ def quizzing(i, noq, pdf_text, time_limit):
     global corrects
     
     # list of questions
-    for k in range(noq):
-        st.session_state.loq.append(quizzer(pdf_text))
+    # for k in range(noq):
+    #     st.session_state.loq.append(quizzer(pdf_text))
     
     # Only print out question portion
-    question = st.session_state.loq[i].split('?')
+    # q = quizzer(pdf_text)
+    st.session_state.q.append(quizzer(pdf_text))
+    question = st.session_state.q[i].split('?')
     
     st.subheader('Question ' + str(i + 1))
         
@@ -86,14 +88,15 @@ def quizzing(i, noq, pdf_text, time_limit):
             st.info(f"You selected '{mc_choice}'")
             st.error(f"Incorrect 🔴 Correct answer is '{correct_ans}'. ")
             
-    else: 
-        progress_bar = st.progress(0, text="Time is passing ...")
-        for t in range(time_limit):
-            time.sleep(1)
-            progress_bar.progress(100//time_limit * t, text="Time is passing ...")
+    # else: 
+        
+        # progress_bar = st.progress(0, text="Time is passing ...")
+        # for t in range(time_limit):
+        #     time.sleep(1)
+        #     progress_bar.progress(100//time_limit * t, text="Time is passing ...")
 
-        progress_bar.empty()
-        st.error(f"Out of time! 🔴 Correct answer is '{correct_ans}'. ")
+        # progress_bar.empty()
+        # st.error(f"Out of time! 🔴 Correct answer is '{correct_ans}'. ")
 
 
 def main():

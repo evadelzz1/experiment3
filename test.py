@@ -48,6 +48,7 @@ def quizzer(pdf_text):
 
 
 def quizzing(i, noq, pdf_text, time_limit):
+    global corrects
     
     # list of questions
     for k in range(noq):
@@ -92,6 +93,14 @@ def quizzing(i, noq, pdf_text, time_limit):
 
         progress_bar.empty()
         st.error(f"Out of time! 🔴 Correct answer is '{correct_ans}'. ")
+        
+    next_question = st.button("Next Question")
+
+    if next_question:
+        if 'current_question' in st.session_state:
+            st.session_state.current_question += 1
+        else:
+            st.session_state.current_question = 1  # Start with the next question
 
 
 def main():
@@ -134,6 +143,10 @@ def main():
         
     global corrects
     corrects = 0
+    
+    if 'current_question' not in st.session_state:
+        st.session_state.current_question = 0
+    
         
     if pdf is not None:
         st.empty()
@@ -147,8 +160,11 @@ def main():
         while j < noq:
             quizzing(j, noq, pdf_text, time_limit)
             j += 1
-                
-        st.write(f"Quiz Finsihed! Your score is {str(corrects)} / {noq}. ")
+        
+        if st.session_state.current_question < noq:
+            quizzing(st.session_state.current_question, noq, pdf_text, time_limit)
+        else:
+            st.subheader(f"Quiz Finished! Your score is {str(corrects)} / {noq}. ")
 
 
 
