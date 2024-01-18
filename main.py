@@ -153,7 +153,7 @@ def main():
             quizzing(j, noq, pdf_text, time_limit)
             j += 1
                 
-        st.subheader(f"Quiz Finsihed! Your score is {str(corrects)} / {noq}. ")
+        st.subheader(f"Quiz Finished! Your score is {str(corrects)} / {noq}. ")
 
 
 
