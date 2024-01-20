@@ -10,13 +10,19 @@ def initialize():
     if 'q' not in st.session_state:
         st.session_state.q = []
 
-def quizzer(pdf_text):
+def quizzer(pdf_text, loq):
     api_key = os.getenv("OPENAI_API_KEY")
     llm = OpenAI(openai_api_key=api_key)
     
+    prev_questions = ""
+    
+    for i in enumerate(loq):
+        prev_questions += str(i) + ", "
+    
     prompt_template = PromptTemplate.from_template(
-        '''Provide a multiple-choice question with only ONE correct answer and the answer from this text: 
-        {pdf_file}
+        '''{pdf_file}
+        Provide a multiple-choice question with only ONE correct answer and the answer from the text above. However, questions 
+        MUST DIFFER from these: {prev_questions}. That is, questions shouldn't ask the same thing as those questions. 
         
         Follow this template:
             Question: (Question)
@@ -36,26 +42,26 @@ def quizzer(pdf_text):
         
         '''
     )
-    quiz = prompt_template.format(pdf_file=pdf_text)
+    quiz = prompt_template.format(pdf_file=pdf_text, prev_questions=prev_questions)
     
     return llm(quiz)
 
 
-def quizzing(i, noq, pdf_text): # Takes care of a single question
+def quizzing(pdf_text, loq): # Takes care of a single question
     
-    mcq = quizzer(pdf_text)
+    mcq = quizzer(pdf_text, loq)
     quiz = mcq.split('?')
     
-    question = quiz[0][10:]
+    question = quiz[0][10:] + "?"
     
     # Only print out multiple choice portion
     # [:-1] is used to omit 'A', 'B', 'C', 'D' in the end of each string
     mc = quiz[1].split('.')
     
-    mco = f'''A. {mc[1][:-1]} \nB.{mc[2][:-1]} \n{mc[3][:-1]} \n{mc[4][:-1]}'''
+    mco = f'''A. {mc[1][:-1]} \nB.{mc[2][:-1]} \nC.{mc[3][:-1]} \nD.{mc[4][:-1]}'''
     
     # Correct answer
-    correct_ans = mc[5]
+    correct_ans = mc[4][-1] + "." + mc[5]
     
     return question, mco, correct_ans
 
@@ -103,7 +109,7 @@ def main():
             pdf_text += page.extract_text()
             
         for i in range(noq):
-            question, mco, correct_ans = quizzing(i, noq, pdf_text)
+            question, mco, correct_ans = quizzing(pdf_text, loq)
             i += 1
             loq.append(question)
             lmco.append(mco)
